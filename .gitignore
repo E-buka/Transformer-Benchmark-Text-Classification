@@ -10,12 +10,19 @@ Thumbs.db
 logs/*
 !logs/.gitkeep
 
-outputs/*
-!outputs/.gitkeep
-
-models/*
-!models/.gitkeep
+output/*
+!output/.gitkeep
 
 data/*
 !data/.gitkeep
-!data/sample_tweet.csv
+!data/bert_df.csv
+!data/distilbert_df
+
+notebook/*
+!notebook/.gitkeep
+
+parameter_tuning/*
+!parameter_tuning/.gitkeep
+
+results/*
+!results/.gitkeep
