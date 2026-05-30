@@ -1,14 +1,17 @@
+import sys, os 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from peft import LoraConfig, TaskType, get_peft_model 
-import utils 
-import config
+from src import utils 
+from src import config
 import json 
-from train import is_complete_checkpoint, find_latest_checkpoint, tokenizer, tokenization
-from seed import set_seed
-from load_data import prepare_dataset
-from log_builder import build_logger
+from src.train import is_complete_checkpoint, find_latest_checkpoint, tokenizer, tokenization
+from src.seed import set_seed
+from src.load_data import prepare_dataset
+from src.log_builder import build_logger
 from transformers import Trainer, EarlyStoppingCallback, DataCollatorWithPadding
 import time
-
+import numpy as np
 
 
 def main():
@@ -34,29 +37,39 @@ def main():
     lora_config = LoraConfig(
         task_type = TaskType.SEQ_CLS, 
         inference_mode=False,  
+        bias="none",
         r= config.LORA_R,
         lora_alpha = config.LORA_ALPHA,
         lora_dropout= config.LORA_DROPOUT,
+        target_modules= ["q_lin", "v_lin"],
+        modules_to_save=["classifier"]
     )
     
     model = utils.model(config.MODEL_NAME, config.NUM_LABELS)
 
     lora_model = get_peft_model(model, lora_config)
-    lora_model_parameters = lora_model.print_trainable_parameters()
+    lora_model.print_trainable_parameters()
+    
+    trainable_params = sum(p.numel() for p in lora_model.parameters() if p.requires_grad)
+    all_params = sum(p.numel() for p in lora_model.parameters())
+    trainable_percentage = 100 * trainable_params / all_params
 
-    with open(config.RESULT_DIR/"peft_params.json", "w") as p:
+    lora_model_parameters = {
+    "trainable_params": trainable_params,
+    "all_params": all_params,
+    "trainable_percentage": trainable_percentage
+    }
+    
+    with open(f"{config.RESULT_DIR}/peft_params.json", "w") as p:
         json.dump(lora_model_parameters, p, indent=2)
 
-    training_args = utils.build_train_args ()
-    training_args.output_dir = f"{config.OUTPUT_DIR}/peft"
-    training_args.logging_dir = f"{config.LOG_DIR}/peft"  
-   
+    training_args = utils.build_train_args()
 
     trainer = Trainer(
             model = lora_model, 
             args = training_args, 
-            train_dataset= train_data, 
-            eval_dataset = eval_data,
+            train_dataset= train_data.select(range(100)), 
+            eval_dataset = eval_data.select(range(50)),
             processing_class = tokenizer,
             data_collator = data_collator,
             compute_metrics = utils.compute_metrics,
@@ -90,11 +103,11 @@ def main():
     stop = time.time() 
     train_time = {"Training_time": round(stop-start, 3)}
     
-    with open(config.RESULT_DIR/"peft_train_time.json") as f:
+    with open(f"{config.RESULT_DIR}/peft_train_time.json", 'w') as f:
         json.dump(train_time, f, indent=2)
     
     best_model_path = f"{training_args.output_dir}/best_model" 
-    lora_model.save_model(best_model_path)
+    lora_model.save_pretrained(best_model_path)
     tokenizer.save_pretrained(best_model_path)
     
     logger.info("PEFT Model training completed successfully with best model and tokenizer saved")
@@ -102,5 +115,4 @@ def main():
     logger.removeHandler(file_handler)
     
 if __name__ == "__main__":
-    main()
-    
+   main()

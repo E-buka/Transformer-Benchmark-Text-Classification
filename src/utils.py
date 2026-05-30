@@ -1,7 +1,11 @@
+import sys, os 
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+
 from transformers import AutoModelForSequenceClassification 
 from transformers import TrainingArguments
 import evaluate 
-import config 
+from src import config 
 import numpy as np 
 import torch 
 
