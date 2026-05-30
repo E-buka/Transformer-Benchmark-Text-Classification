@@ -84,12 +84,16 @@ Model to train is selected in src/config.py through MODEL_NAME
 
 Two training options are available: 
 
+
 - **Full fine-tuning**: selected by setting `peft` to False in src/config.py
->> Full tine-tuning script and the rest of the model resources are set in `src/` package
+> Full tine-tuning script and the rest of the model resources are set in `src/` package
+
 - **PEFT training**: selected by setting `peft` to True in src/config.py 
->> PEFT training and prediction script are set and controlled from `peft_src/` package
+> PEFT training and prediction script are set and controlled from `peft_src/` package
+
 
 Training will: 
+
 - load the selected pretrained model and tokenizer
 - load, tokenize and pad the dataset
 - fine-tune the model
@@ -100,6 +104,7 @@ Training will:
 ```bash
 python src/train.py
 ``` 
+
 ```bash
 python peft_src/peft_train.py
 ```
@@ -132,6 +137,7 @@ Two test prediction script are availble:
 ```bash
 python src/predict.py
 ```
+
 ```bash
 python peft_src/peft_predict.py
 ```
