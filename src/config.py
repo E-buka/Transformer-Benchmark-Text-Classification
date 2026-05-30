@@ -63,6 +63,9 @@ CHECKPOINT_FILES = {
 }
 
 
+MODEL_TO_SERVE = OUTPUT_BASE/"peft"/"distilbert"/"best_model"
+
+
 MAX_SEQ_LENGTH = 512
 EPOCHS=5
 BATCH_SIZE = 8

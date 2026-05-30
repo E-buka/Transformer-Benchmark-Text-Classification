@@ -1,0 +1,11 @@
+{
+  "objective": 0.892,
+  "hyperparameters": {
+    "learning_rate": 6.440037254992653e-05,
+    "per_device_train_batch_size": 8,
+    "weight_decay": 0.08978565486389789,
+    "gradient_accumulation_steps": 4,
+    "warmup_steps": 2,
+    "neftune_noise_alpha": 6.982938544247626
+  }
+}

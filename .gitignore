@@ -24,9 +24,3 @@ notebook/*
 parameter_tuning/*
 !parameter_tuning/.gitkeep
 
-results/*
-!results/.gitkeep
-!results/bert/best_hyperparameters.json
-!results/distilbert/test_metrics.json
-!results/distilbert/train_time.json
-!results/peft/distilbert/*
