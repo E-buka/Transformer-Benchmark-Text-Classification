@@ -27,9 +27,7 @@ PEFT performance:
 - **Number of trainable parameters**: 1.1% (741,124 of 67,697,672)
 - **Model size**: 3.51MB
 
-The PEFT model was served using FastAPI app for inference on the cloud and can be accessed using the link to the server: 
-
-Link:
+The PEFT model was dockerized and served using FastAPI app for inference and can be accessed access using a local machine server. 
 
 The project also includes: 
 - hyperparameter search with BERT transformer model using a subset of the train dataset. (Only a subset of the dataset and BERT model was used due to limited computing resources)
@@ -72,6 +70,7 @@ transformer-model/
 │   └── utils.py
 ├── data_split_result.json
 ├── README.md
+├── Dockerfile
 └── requirements.txt
 ``` 
 ## How to Run
@@ -116,7 +115,7 @@ output/peft/distilbert/best_model/
 ```
 
 #### Dataset class balance
-Dataset class balance can be evaluated from src/load_data.py. The result is save to the root folder. 
+Dataset class balance can be evaluated from src/load_data.py. The result is saved to the root folder. 
 
 ```bash
 python src/load_data.py
@@ -130,6 +129,7 @@ The best parameters are saved to results/{model_name}
 
 #### Prediction
 Test data prediction is generated and the test metrics are computed for the test data. The test metrics are saved to results/{model_name} while the predicted test data are saved to data/ 
+
 Two test prediction script are availble: 
 - **full fine-tuning test prediction**: src/predict.py
 - **peft test prediction**: peft_src/peft_predict.py 
@@ -146,17 +146,24 @@ python peft_src/peft_predict.py
 Loads the PEFT trained model and predicts a class for a single text or lists of texts. 
 
 ```bash
-
+python src/inference.py
 ```
 ## API 
-FastAPI
+The model is containerized using Docker and served with FastAPI. The FastAPI app loads the peft model on startup and predicts through the API. 
 
-## Notebooks
-- colab_train.ipynb -- Colab model fine-tuning and test data prediction 
-- Peft vs full training comparison.ipynb -- Tradeoffs comparisions
-- Transformer full training error analysis.ipynb -- evaluation and error analysis
+Run locally with: 
+```bash
+uvicorn src.app:app --reload
+```
+
+
+## Notebook
+- Summary error analysis and performance.ipynb -- Tradeoffs and error analysis summary
 
 ## Limitations 
+- The hyperparameter search was conducted for only a single model and using a small subset of the dataset due to limited resources. The results of the search may not represent the best hyperparameters for the entire dataset training. 
+- The first section of the project which compares BERT and DistilBERT transformer models were only trained using a subset (40,000) of the entire dataset due to GPU unavailability. 
+- The models were only trained for 5 epochs and therefore further training may have likely improved the model performances.
 
 ## Conclusion
 The project is an end-to-end NLP for text classification which benchmarks two transformer models, compares full-tuning vs parameter efficient fine-tuning, evaluation and API serving. BERT and DistilBERT transformer models were compared on the same dataset, full fine-tuning and PEFT tuning of DistilBERT model were compared, with greater efficiency achieved with PEFT fine-tuning. 
