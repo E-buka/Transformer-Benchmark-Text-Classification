@@ -2,10 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
-full_training_for_comparative_analysis = False 
-
-if full_training_for_comparative_analysis: 
-    ROOT = ROOT/"transformer_models"
+peft = True ## update to True is using peft_trained model
 
 # MODEL_NAME = "bert-base-uncased"
 
@@ -24,10 +21,7 @@ LOG_BASE = ROOT/"logs"
 RESULT_BASE = ROOT/"results"
 DATA = ROOT/"data"
 
-
 paths_to_create = [OUTPUT_BASE, NOTEBOOK, LOG_BASE, RESULT_BASE, DATA]
-
-peft = True ## update to True is using peft_trained model
 
 if peft: 
     paths_to_create.extend([
@@ -72,6 +66,9 @@ BATCH_SIZE = 8
 NUM_LABELS = 4
 SEED = 200
 BEST_MODEL_METRIC = "f1"
+
+TRAIN_SUBSET_SIZE = 25000
+EVAL_SUBSET_SIZE = 10000
 
 
 GRADIENT_ACC_STEPS=4

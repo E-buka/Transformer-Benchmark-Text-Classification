@@ -20,10 +20,10 @@ def test_metrics(y_true, y_pred):
     load_recall = evaluate.load("recall")
     load_f1 = evaluate.load("f1")
 
-    accuracy = load_accuracy.compute(predictions=y_true, references=y_pred)["accuracy"]
-    precision = load_precision.compute(predictions=y_true, references=y_pred, average="micro")["precision"]
-    recall = load_recall.compute(predictions=y_true, references=y_pred, average='micro', zero_division=0)["recall"]
-    f1 = load_f1.compute(predictions=y_true, references=y_pred, average='micro')["f1"]
+    accuracy = load_accuracy.compute(predictions=y_pred, references=y_true)["accuracy"]
+    precision = load_precision.compute(predictions=y_pred, references=y_true, average="micro")["precision"]
+    recall = load_recall.compute(predictions=y_pred, references=y_true, average='micro', zero_division=0)["recall"]
+    f1 = load_f1.compute(predictions=y_pred, references=y_true, average='micro')["f1"]
     cm = confusion_matrix(y_true, y_pred)
 
     return {

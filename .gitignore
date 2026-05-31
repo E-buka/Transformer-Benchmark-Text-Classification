@@ -16,10 +16,10 @@ output/*
 data/*
 !data/.gitkeep
 !data/bert_df.csv
-!data/distilbert_df
+!data/distilbert_df.csv
 
-notebook/*
-!notebook/.gitkeep
+notebooks/*
+!notebooks/.gitkeep
 
 parameter_tuning/*
 !parameter_tuning/.gitkeep

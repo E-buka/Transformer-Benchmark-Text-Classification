@@ -50,9 +50,9 @@ def main(config):
     set_seed()
     global tokenizer
 
-    logger, file_handler, console_handler = build_logger()
+    logger, file_handler = build_logger()
+    logger.removeHandler(file_handler)
     logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
 
     logger.debug("Loading train and validation datasets for model training")
 
@@ -62,9 +62,10 @@ def main(config):
 
     train_data = train.map(tokenization, batched=True)
     val_data = validation.map(tokenization, batched=True)
-
-    if not train_data and val_data:
-        logger.critical(f"Failure preparing data")
+    
+    if config.TRAIN_SUBSET_SIZE and config.EVAL_SUBSET_SIZE:
+        train_data = train_data.select(range(config.TRAIN_SUBSET_SIZE))
+        eval_data = eval_data.select(range(config.EVAL_SUBSET_SIZE))
 
     logger.debug("Building model and training arguments")
 
@@ -74,8 +75,8 @@ def main(config):
     trainer = Trainer(
         model = model,
         args = training_args,
-        train_dataset= train_data.select(range(25000)),
-        eval_dataset = val_data.select(range(10000)),
+        train_dataset= train_data.select(range(config.TRAIN_SUBSET_SIZE)),
+        eval_dataset = val_data.select(range(config.EVAL_SUBSET_SIZE)),
         processing_class = tokenizer,
         data_collator = data_collator,
         compute_metrics = utils.compute_metrics,
@@ -87,11 +88,11 @@ def main(config):
 
     logger.debug(f"Model selected as >>> {config.MODEL_NAME} <<< ")
     logger.info("============BATCH TRAINING INFORMATION============ "
-        f"Train size: {len(train_data)} "
+        f"Train size: {len(trainer.train_dataset)} "
         f"Batch size: {config.BATCH_SIZE} "
         f"Epochs: {config.EPOCHS} "
-        f"Steps per epoch: {len(train_data) // config.BATCH_SIZE} "
-        f"Approx total steps: {(len(train_data) // config.BATCH_SIZE) * config.EPOCHS}"
+        f"Steps per epoch: {len(trainer.train_dataset) // config.BATCH_SIZE} "
+        f"Approx total steps: {(len(trainer.eval_dataset) // config.BATCH_SIZE) * config.EPOCHS}"
     )
 
     last_checkpoint = find_latest_checkpoint(training_args.output_dir)
@@ -114,8 +115,9 @@ def main(config):
     tokenizer.save_pretrained(best_model_path)
 
     logger.info("Model training completed successfully with best model and tokenizer saved")
-    logger.removeHandler(console_handler)
     logger.removeHandler(file_handler)
 
 if __name__ == "__main__":
     main(config)
+    
+    
