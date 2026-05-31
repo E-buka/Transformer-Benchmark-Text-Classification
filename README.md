@@ -156,6 +156,10 @@ Run locally with:
 uvicorn src.app:app --reload
 ```
 
+Run locally with Docker: 
+```bash
+docker compose up -d
+```` 
 
 ## Notebook
 - Summary error analysis and performance.ipynb -- Tradeoffs and error analysis summary
